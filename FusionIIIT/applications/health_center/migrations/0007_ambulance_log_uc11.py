@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('globals', '0006_ambulance_log_uc11'),
+        ('globals', '0005_moduleaccess_database'),
         ('health_center', '0006_consultation_ambulance_requested'),
     ]
 

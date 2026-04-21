@@ -1,3 +1,4 @@
+from django.http import Http404
 """
 Health Center API Views
 =======================
@@ -120,6 +121,8 @@ class DoctorAvailabilityView(APIView):
                 return Response(serializer.data)
         except Doctor.DoesNotExist:
             return Response({'detail': 'Doctor not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -178,6 +181,8 @@ class AppointmentView(APIView):
                     status=status.HTTP_201_CREATED
                 )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -203,6 +208,8 @@ class AppointmentView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Appointment.DoesNotExist:
             return Response({'detail': 'Appointment not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -327,6 +334,8 @@ class ReimbursementClaimView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except services.InvalidReimbursementSubmission as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -359,6 +368,8 @@ class ClaimDocumentUploadView(APIView):
                            f'Error: {str(e)}'},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -402,6 +413,8 @@ class HealthProfileView(APIView):
         try:
             profile = services.create_or_update_health_profile(patient_id, request.data)
             return Response(HealthProfileSerializer(profile).data)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -461,6 +474,8 @@ class StaffClaimProcessingView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except ReimbursementClaim.DoesNotExist:
             return Response({'detail': 'Claim not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -518,6 +533,8 @@ class ReimbursementView(APIView):
                 {'detail': 'User information not found'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -566,6 +583,8 @@ class ReimbursementView(APIView):
                 {'detail': 'User information not found'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -614,6 +633,8 @@ class ReimbursementView(APIView):
                 {'detail': 'User information not found'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -660,6 +681,8 @@ class ReimbursementView(APIView):
                 {'detail': f'Claim {claim_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -714,6 +737,8 @@ class CompounderReimbursementView(APIView):
             serializer = ReimbursementClaimSerializer(claims, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -794,6 +819,8 @@ class CompounderReimbursementWorkflowView(APIView):
                 {'detail': f'Claim {claim_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -891,6 +918,8 @@ class AccountsReimbursementApprovalView(APIView):
                 {'detail': f'Claim {claim_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -947,6 +976,8 @@ class InventoryView(APIView):
             })
         except services.InvalidStockUpdate as e:
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -989,6 +1020,8 @@ class DashboardView(APIView):
                 return Response(DashboardStatsSerializer(stats).data)
             else:
                 return Response({'detail': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1060,6 +1093,8 @@ class CompounderDoctorView(APIView):
                 {'detail': f'Doctor with ID {doctor_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1097,6 +1132,8 @@ class CompounderDoctorView(APIView):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1141,6 +1178,8 @@ class CompounderDoctorView(APIView):
                 {'detail': f'Doctor with ID {doctor_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1178,6 +1217,8 @@ class CompounderDoctorView(APIView):
                 {'detail': f'Doctor with ID {doctor_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1236,6 +1277,8 @@ class CompounderDoctorScheduleView(APIView):
                 
                 serializer = DoctorScheduleSerializer(schedules, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1273,6 +1316,8 @@ class CompounderDoctorScheduleView(APIView):
                 serializer.data,
                 status=status.HTTP_201_CREATED
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1313,6 +1358,8 @@ class CompounderDoctorScheduleView(APIView):
                 serializer.data,
                 status=status.HTTP_200_OK
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1347,6 +1394,8 @@ class CompounderDoctorScheduleView(APIView):
                 {'detail': f'Schedule for {doctor_name} on {day} successfully deleted'},
                 status=status.HTTP_204_NO_CONTENT
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1398,6 +1447,8 @@ class PatientScheduleView(APIView):
                 {'detail': f'Doctor with ID {doctor_id} not found or is inactive'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1461,6 +1512,8 @@ class CompounderAttendanceView(APIView):
                 {'detail': f'Attendance record with ID {attendance_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1493,6 +1546,8 @@ class CompounderAttendanceView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
             
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1542,6 +1597,8 @@ class CompounderAttendanceView(APIView):
                 {'detail': f'Attendance record with ID {attendance_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1578,6 +1635,8 @@ class CompounderAttendanceView(APIView):
                 {'detail': f'Attendance record with ID {attendance_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1613,6 +1672,8 @@ class CompounderMedicineView(APIView):
             serializer = MedicineSerializer(medicines, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
                 
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1653,6 +1714,8 @@ class CompounderMedicineView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
                 
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1714,6 +1777,8 @@ class CompounderStockView(APIView):
                 {'detail': f'Stock with ID {stock_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1771,6 +1836,8 @@ class CompounderStockView(APIView):
                 {'detail': 'Medicine not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1812,6 +1879,8 @@ class CompounderStockView(APIView):
                 {'detail': f'Stock with ID {stock_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1849,6 +1918,8 @@ class CompounderStockView(APIView):
                 {'detail': f'Stock with ID {stock_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1912,6 +1983,8 @@ class CompounderExpiryView(APIView):
                 {'detail': f'Expiry batch with ID {expiry_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1964,6 +2037,8 @@ class CompounderExpiryView(APIView):
             response_serializer = ExpirySerializer(expiry)
             return Response(response_serializer.data, status=status.HTTP_201_CREATED)
             
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2064,6 +2139,8 @@ class CompounderExpiryView(APIView):
                 {'detail': f'Expiry batch with ID {expiry_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2101,6 +2178,8 @@ class CompounderExpiryView(APIView):
                 {'detail': f'Expiry batch with ID {expiry_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2171,6 +2250,8 @@ class CompounderPrescriptionView(APIView):
                 {'detail': f'Prescription with ID {prescription_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2318,6 +2399,8 @@ class CompounderPrescriptionView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2383,6 +2466,8 @@ class CompounderPrescriptionView(APIView):
                 {'detail': f'Prescription with ID {prescription_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2437,6 +2522,8 @@ class CompounderPrescriptionView(APIView):
                         status=status.HTTP_400_BAD_REQUEST
                     )
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2551,6 +2638,8 @@ class CompounderConsultationView(APIView):
             
             return Response(data, status=status.HTTP_200_OK)
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2613,6 +2702,8 @@ class PatientPrescriptionView(APIView):
                 {'detail': 'Prescription not found or does not belong to you'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2681,6 +2772,8 @@ class PatientComplaintView(APIView):
                 {'detail': 'Patient record not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2736,6 +2829,8 @@ class PatientComplaintView(APIView):
                 {'detail': 'Complaint not found or does not belong to you'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2802,6 +2897,8 @@ class PatientComplaintView(APIView):
                 {'detail': 'Patient record not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2854,6 +2951,8 @@ class PatientComplaintView(APIView):
                 {'detail': 'Complaint not found or does not belong to you'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2922,6 +3021,8 @@ class CompounderComplaintView(APIView):
                 {'detail': f'Complaint with ID {complaint_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2984,6 +3085,8 @@ class CompounderComplaintView(APIView):
                 {'detail': 'Staff record not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3051,6 +3154,8 @@ class CompounderHospitalAdmitView(APIView):
             serializer = HospitalAdmitSerializer(admissions, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3093,6 +3198,8 @@ class CompounderHospitalAdmitView(APIView):
                 {'detail': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3145,6 +3252,8 @@ class CompounderHospitalAdmitView(APIView):
                 {'detail': str(e)},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3184,6 +3293,8 @@ class CompounderHospitalAdmitView(APIView):
                 {'detail': f'Hospital admission {admission_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3250,6 +3361,8 @@ class CompounderAmbulanceView(APIView):
             serializer = AmbulanceRecordsSerializer(ambulances, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3283,6 +3396,8 @@ class CompounderAmbulanceView(APIView):
                 {'detail': str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3320,6 +3435,8 @@ class CompounderAmbulanceView(APIView):
                 {'detail': str(e)},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3359,6 +3476,8 @@ class CompounderAmbulanceView(APIView):
                 {'detail': f'Ambulance {ambulance_id} not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3417,6 +3536,8 @@ class CompounderAmbulanceLogView(APIView):
 
             return Response(AmbulanceLogSerializer(logs, many=True).data, status=status.HTTP_200_OK)
 
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3449,6 +3570,8 @@ class CompounderAmbulanceLogView(APIView):
 
             return Response(AmbulanceLogSerializer(entry).data, status=status.HTTP_201_CREATED)
 
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3474,6 +3597,8 @@ class CompounderAmbulanceLogView(APIView):
             return Response({'detail': f'Ambulance log #{log_id} deleted.'},
                             status=status.HTTP_200_OK)
 
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3550,6 +3675,8 @@ class CompounderUserView(APIView):
             
             return Response(data, status=status.HTTP_200_OK)
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3667,6 +3794,8 @@ class CompounderConsultationFormView(APIView):
                 {'detail': f'Invalid data format: {str(e)}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3707,6 +3836,8 @@ class CompounderConsultationFormView(APIView):
                 {'detail': 'Invalid consultation ID'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3761,6 +3892,8 @@ class AuditorDebugView(APIView):
                 'available_statuses': statuses,
                 'authenticated_user': str(request.user),
             })
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3827,6 +3960,8 @@ class AuditorReimbursementView(APIView):
             
             return Response(serializer.data, status=status.HTTP_200_OK)
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3912,6 +4047,8 @@ class AuditorReimbursementView(APIView):
                 {'detail': 'Claim not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3956,6 +4093,8 @@ class AuditorClaimDocumentDownloadView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
         
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -3991,6 +4130,8 @@ class CompounderInventoryRequisitionView(APIView):
                 return Response(InventoryRequisitionSerializer(reqs, many=True).data)
         except InventoryRequisition.DoesNotExist:
             return Response({'detail': 'Requisition not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -4023,6 +4164,8 @@ class CompounderInventoryRequisitionView(APIView):
                 
                 return Response(InventoryRequisitionSerializer(requisition).data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -4054,6 +4197,8 @@ class CompounderInventoryRequisitionView(APIView):
 
             return Response(InventoryRequisitionSerializer(requisition).data, status=status.HTTP_200_OK)
 
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -4255,6 +4400,8 @@ class AnnouncementView(APIView):
                 HealthAnnouncementSerializer(announcement).data,
                 status=status.HTTP_201_CREATED
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -4286,6 +4433,8 @@ class AnnouncementView(APIView):
                 {'detail': f'Announcement #{announcement_id} deactivated.'},
                 status=status.HTTP_200_OK
             )
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -4418,6 +4567,8 @@ class SystemReportView(APIView):
 
             return Response(report_payload, status=status.HTTP_200_OK)
 
+        except Http404:
+            raise
         except Exception as e:
             logger.error(f'Unexpected error: {str(e)}', exc_info=True)
             return Response({'detail': 'An unexpected error occurred while processing the request. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

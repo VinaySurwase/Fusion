@@ -1148,13 +1148,19 @@ def update_ambulance_record(ambulance_id, update_data):
     
     ambulance.save()
     
-    # Log audit
+    # Log audit — convert date objects to ISO strings for JSON serialization
+    safe_details = {}
+    for k, v in update_data.items():
+        if isinstance(v, date):
+            safe_details[k] = v.isoformat()
+        else:
+            safe_details[k] = v
     log_audit_action(
         user_id=None,
         action_type='UPDATE',
         entity_type='AmbulanceRecord',
         entity_id=ambulance.id,
-        details=update_data
+        details=safe_details
     )
     
     return ambulance
